@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservices-app-deployment # Name of your deployment
+  namespace: pwc-task-namespace # Ensure this matches the namespace you created earlier
+  labels:
+    app: microservices-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservices-app
+  template:
+    metadata:
+      labels:
+        app: microservices-app
+    spec:
+      serviceAccountName: default # Or create a specific service account if needed
+      automountServiceAccountToken: false
+      containers:
+      - name: microservices-app 
+        image: <to-be-created>
+        imagePullPolicy: IfNotPresent # Pulls the image if it's not already present on the node. Use 'Always' for production to ensure the latest version.
+        # Resource Management: Define resource requests and limits
+        resources:
+          requests:
+            cpu: "100m" # Request 100 millicores of CPU (0.1 CPU core)
+            memory: "128Mi" # Request 128 Megabytes of memory
+          limits:
+            cpu: "500m" # Limit to 500 millicores of CPU (0.5 CPU core)
+            memory: "512Mi" # Limit to 512 Megabytes of memory
+        ports:
+        - containerPort: 5000
+        securityContext:
+          allowPrivilegeEscalation: false # Prevent processes in the container from gaining more privileges than their parent
+          readOnlyRootFilesystem: true # Make the container's root filesystem read-only to prevent unauthorized writes
+          runAsNonRoot: true # Ensure the container runs as a non-root user
+          runAsUser: 1000 # Specify a non-root user ID (e.g., 1000 is a common choice for non-root users)
+          # Capabilities: Drop all unnecessary Linux capabilities
+          # This removes powerful permissions that the container doesn't need
+          capabilities:
+            drop:
+              - ALL
+        livenessProbe:
+          httpGet:
+            path: / # Assuming a health endpoint at the root path, adjust if your app has a specific /health endpoint
+            port: 5000 
+          initialDelaySeconds: 10 # Wait 10 seconds before starting the first probe
+          periodSeconds: 5 # Check every 5 seconds
+          timeoutSeconds: 3 # Timeout after 3 seconds
+          failureThreshold: 3 # After 3 consecutive failures, restart the container
+        readinessProbe:
+          httpGet:
+            path: /product # Assuming a health endpoint at the root path
+            port: 5000
+          initialDelaySeconds: 15 # Wait 15 seconds before starting the first probe
+          periodSeconds: 10 # Check every 10 seconds
+          timeoutSeconds: 5 # Timeout after 5 seconds
+          failureThreshold: 2 # After 2 consecutive failures, mark the pod as unready
