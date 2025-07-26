@@ -74,15 +74,6 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 }
 
-# Link the automatically created Private DNS Zone for AKS to your VNet
-# This ensures that DNS resolution for the private AKS API server endpoint works within your VNet.
-resource "azurerm_private_dns_zone_virtual_network_link" "aks_private_dns_link" {
-  name                  = "${var.cluster_name}-privatedns-link"
-  resource_group_name   = var.resource_group_name
-  private_dns_zone_name = azurerm_kubernetes_cluster.main.private_fqdn # Uses the FQDN of the private cluster
-  virtual_network_id    = var.vnet_id # Directly use the input variable
-  registration_enabled  = false # Set to true if VMs in VNet need to register their DNS records in this zone
-}
 
 # --- Azure Container Registry (ACR) Configuration ---
 
