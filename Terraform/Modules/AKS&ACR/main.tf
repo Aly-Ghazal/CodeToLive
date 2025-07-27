@@ -12,6 +12,13 @@ resource "azurerm_role_assignment" "aks_network_contributor_on_rt" {
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_user_assigned_identity.aks_identity.principal_id
 }
+# Grant AKS Managed Identity Contributor role on the VNet
+resource "azurerm_role_assignment" "aks_vnet_contributor" {
+  scope                = var.vnet_id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_kubernetes_cluster.aks_cluster.identity[0].principal_id
+  depends_on           = [azurerm_kubernetes_cluster.aks_cluster]
+}
 
 # Create the Private AKS Cluster
 resource "azurerm_kubernetes_cluster" "main" {
