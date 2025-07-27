@@ -32,6 +32,8 @@ spec:
         ports:
         - containerPort: 5000
         securityContext:
+          seccompProfile:
+            type: RuntimeDefault
           allowPrivilegeEscalation: false # Prevent processes in the container from gaining more privileges than their parent
           readOnlyRootFilesystem: true # Make the container's root filesystem read-only to prevent unauthorized writes
           runAsNonRoot: true # Ensure the container runs as a non-root user
