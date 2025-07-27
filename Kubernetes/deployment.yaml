@@ -19,7 +19,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: microservices-app 
-        image: akssecureacr.azurecr.io/microservices-app:3.0
+        image: akssecureacr.azurecr.io/microservices-app:4.0
         imagePullPolicy: IfNotPresent # Pulls the image if it's not already present on the node. Use 'Always' for production to ensure the latest version.
         # Resource Management: Define resource requests and limits
         resources:
