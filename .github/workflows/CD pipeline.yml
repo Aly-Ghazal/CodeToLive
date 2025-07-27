@@ -1,0 +1,48 @@
+# This workflow deploys Kubernetes objects from the 'Kubernetes' directory
+# to a configured Kubernetes cluster using kubectl.
+
+name: Deploy Kubernetes Objects
+
+# Configure when this workflow runs.
+on:
+  push:
+    branches:
+      - main # Trigger on pushes to the 'main' branch.
+      # You can add other branches or tags here if needed, e.g.,
+      # - develop
+  workflow_dispatch: # Allows manual triggering of the workflow from the GitHub UI.
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      # Step 1: Checkout the repository code
+      # This action checks out your repository under $GITHUB_WORKSPACE,
+      # so your workflow can access it.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      # Step 4: Verify kubectl context (optional but recommended)
+      # This step helps confirm that kubectl is configured correctly and
+      # can connect to your cluster.
+      - name: Verify kubectl context
+        run: |
+          kubectl config current-context
+          kubectl get nodes
+
+      # Step 5: Deploy Kubernetes objects
+      # This is the core deployment step. It applies all YAML/JSON files
+      # found in the 'Kubernetes/' directory.
+      - name: Apply Kubernetes manifests
+        run: |
+          # Check if the Kubernetes directory exists
+          if [ -d "Kubernetes" ]; then
+            echo "Applying Kubernetes manifests from 'Kubernetes/' directory..."
+            # Apply all .yaml and .json files in the Kubernetes directory
+            kubectl apply -f Kubernetes/
+            echo "Kubernetes manifests applied successfully."
+          else
+            echo "Error: 'Kubernetes/' directory not found. No manifests to deploy."
+            exit 1 # Exit with an error if the directory doesn't exist
+          fi
