@@ -45,7 +45,7 @@ spec:
               - ALL
         livenessProbe:
           httpGet:
-            path: / # Assuming a health endpoint at the root path, adjust if your app has a specific /health endpoint
+            path: /products # Assuming a health endpoint at the root path, adjust if your app has a specific /health endpoint
             port: 5000 
           initialDelaySeconds: 10 # Wait 10 seconds before starting the first probe
           periodSeconds: 5 # Check every 5 seconds
@@ -53,7 +53,7 @@ spec:
           failureThreshold: 3 # After 3 consecutive failures, restart the container
         readinessProbe:
           httpGet:
-            path: /product # Assuming a health endpoint at the root path
+            path: /products # Assuming a health endpoint at the root path
             port: 5000
           initialDelaySeconds: 15 # Wait 15 seconds before starting the first probe
           periodSeconds: 10 # Check every 10 seconds
