@@ -93,7 +93,7 @@ and finally access AKS by geting its creds (Kubeconfig)
 az aks get-credentials --resource-group $RESOURCE_GROUP_NAME --name $AKS_NAME --overwrite-existing
 ```
 
-Now to setup the VM to be a GitHub self-hosted runner
+3. Now to setup the VM to be a GitHub self-hosted runner
 
 ```
 # Create a folder (Note: if you will use the same VM for Multiple Pipelines change the folder name)
