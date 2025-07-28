@@ -42,15 +42,15 @@ jobs:
 
             # Apply Namespace YAMLs first
             echo "Applying Namespace manifests..."
-            find Kubernetes/ -name "*namespace.yaml" -print0 | xargs -0 -r kubectl apply -f - || true
+            kubectl apply -f namespace.yaml
 
             # Apply Deployment YAMLs next
             echo "Applying Deployment manifests..."
-            find Kubernetes/ -name "*deployment.yaml" -print0 | xargs -0 -r kubectl apply -f - || true
+            kubectl apply -f deployment.yaml
 
             # Apply Service YAMLs last
             echo "Applying Service manifests..."
-            find Kubernetes/ -name "*service.yaml" -print0 | xargs -0 -r kubectl apply -f - || true
+            kubectl apply -f service.yaml
 
             echo "Kubernetes manifests applied successfully in order."
           else
