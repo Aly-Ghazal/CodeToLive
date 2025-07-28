@@ -43,24 +43,6 @@ resource "azurerm_network_security_group" "aks_nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-  security_rule {
-     access                                     = "Allow"
-     description                                = ""
-     destination_address_prefix                 = "*"
-     destination_address_prefixes               = []
-     destination_application_security_group_ids = []
-     destination_port_range                     = "*"
-     destination_port_ranges                    = []
-     direction                                  = "Inbound"
-     name                                       = "AllowAnyCustomAnyInbound"
-     priority                                   = 101
-     protocol                                   = "*"
-     source_address_prefix                      = "*"
-     source_address_prefixes                    = []
-     source_application_security_group_ids      = []
-     source_port_range                          = "*"
-     source_port_ranges                         = []
-  }
   security_rule{
      access                                     = "Allow"
      description                                = ""
@@ -166,7 +148,7 @@ resource "azurerm_network_security_group" "runner_nsg" {
     source_port_range          = "*"
     destination_port_range     = "443"
     source_address_prefix      = "*"
-    destination_address_prefix = "*" # Azure service tag for GitHub
+    destination_address_prefix = "*"
     description                = "Allow outbound HTTPS to GitHub for runner"
   }
   security_rule {
@@ -367,42 +349,6 @@ resource "azurerm_network_security_group" "acr_nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
     description                = "Allow all outbound (can be restricted by Firewall)"
-  }
-  security_rule { 
-     access                                     = "Allow"
-     description                                = ""
-     destination_address_prefix                 = "*"
-     destination_address_prefixes               = []
-     destination_application_security_group_ids = []
-     destination_port_range                     = "443"
-     destination_port_ranges                    = []
-     direction                                  = "Inbound"
-     name                                       = "AllowTagHTTPSInbound"
-     priority                                   = 150
-     protocol                                   = "Tcp"
-     source_address_prefix                      = "VirtualNetwork"
-     source_address_prefixes                    = []
-     source_application_security_group_ids      = []
-     source_port_range                          = "*"
-     source_port_ranges                         = []
-  }
-  security_rule {
-     access                                     = "Allow"
-     description                                = ""
-     destination_address_prefix                 = "*"
-     destination_address_prefixes               = []
-     destination_application_security_group_ids = []
-     destination_port_range                     = "80"
-     destination_port_ranges                    = []
-     direction                                  = "Inbound"
-     name                                       = "AllowTagHTTPInbound"
-     priority                                   = 151
-     protocol                                   = "Tcp"
-     source_address_prefix                      = "VirtualNetwork"
-     source_address_prefixes                    = []
-     source_application_security_group_ids      = []
-     source_port_range                          = "*"
-     source_port_ranges                         = []
   }
 }
 
