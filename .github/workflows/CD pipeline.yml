@@ -23,7 +23,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         
-      # Step 4: Verify kubectl context (optional but recommended)
+      # Step 2: Verify kubectl context (optional but recommended)
       # This step helps confirm that kubectl is configured correctly and
       # can connect to your cluster.
       - name: Verify kubectl context
@@ -31,17 +31,28 @@ jobs:
           kubectl config current-context
           kubectl get nodes
 
-      # Step 5: Deploy Kubernetes objects
+      # Step 3: Deploy Kubernetes objects
       # This is the core deployment step. It applies all YAML/JSON files
       # found in the 'Kubernetes/' directory.
-      - name: Apply Kubernetes manifests
+      - name: Apply Kubernetes manifests in order
         run: |
           # Check if the Kubernetes directory exists
           if [ -d "Kubernetes" ]; then
-            echo "Applying Kubernetes manifests from 'Kubernetes/' directory..."
-            # Apply all .yaml and .json files in the Kubernetes directory
-            kubectl apply -f Kubernetes/
-            echo "Kubernetes manifests applied successfully."
+            echo "Applying Kubernetes manifests from 'Kubernetes/' directory in specific order..."
+
+            # Apply Namespace YAMLs first
+            echo "Applying Namespace manifests..."
+            find Kubernetes/ -name "*namespace.yaml" -print0 | xargs -0 -r kubectl apply -f - || true
+
+            # Apply Deployment YAMLs next
+            echo "Applying Deployment manifests..."
+            find Kubernetes/ -name "*deployment.yaml" -print0 | xargs -0 -r kubectl apply -f - || true
+
+            # Apply Service YAMLs last
+            echo "Applying Service manifests..."
+            find Kubernetes/ -name "*service.yaml" -print0 | xargs -0 -r kubectl apply -f - || true
+
+            echo "Kubernetes manifests applied successfully in order."
           else
             echo "Error: 'Kubernetes/' directory not found. No manifests to deploy."
             exit 1 # Exit with an error if the directory doesn't exist
