@@ -20,9 +20,39 @@ In this project we used Azure as a cloud provider and from the previous image we
 - **Azure VM**: Dedicated for running Git Actions pipelines and manage the cluster.
 - **Azure Container Registry (ACR)**: Secured with a private endpoint for image storage.
 
-Most of these infrastructure components are provisioned and managed using Terraform, ensuring a declarative, version-controlled, and automated deployment process.
+Most of these infrastructure components are provisioned and managed using Terraform, ensuring a declarative, version-controlled, and automated deployment process and this infrastructure is structured using Terraform modules, which significantly enhances maintainability and scalability. Modules encapsulate complex configurations into reusable blocks, allowing for consistent deployment patterns and easy replication of this secure environment across different projects or environments with minimal effort.
 
-and here are the commands the has done it
+and here is the structure of those modules
+
+```
+.
+├── main.tf
+├── variables.tf
+├── outputs.tf  
+└── modules/
+    ├── AKS&ACR/
+    │   ├── main.tf
+    │   ├── variables.tf
+    │   └── outputs.tf
+    ├── Bastion/
+    │   ├── main.tf
+    │   ├── variables.tf
+    │   └── outputs.tf
+    ├── security (firewall)/
+    │   ├── main.tf
+    │   ├── variables.tf
+    │   └── outputs.tf
+    ├── Networking/
+    │   ├── main.tf
+    │   ├── variables.tf
+    │   └── outputs.tf
+    └── jump_host (vm)/
+        ├── main.tf
+        ├── variables.tf
+        └── outputs.tf
+```
+
+and here are the commands the has provisioned that Infra
 
 ```
 #To download necessary providers and needed modules
@@ -42,6 +72,8 @@ and the only thing was done manaully was creating the DNAT rule to forward the e
 ![DNAT rule](docs/images/2.png)
 
 ## APP Dockerization
+
+Our Flask application is containerized using Docker, with a Dockerfile that employs multi-stage builds. This approach drastically reduces the final image size and improves security by only including necessary runtime components. Furthermore, our use of Alpine Linux base images ensures our containers are exceptionally light, minimal, and secure. Below, you'll find a visual comparison highlighting the significant image size difference achieved through multi-stage builds.
 
 ![Multi-stage effect](docs/images/3.png)
 
@@ -117,6 +149,21 @@ $ nohup ./run.sh &
 and this is how the setup was done
 
 ## CI/CD pipeline using GitHub actions
+
+## Results
+
+after provisioning our infra and deploy the application you can access it through the following URL
+
+```
+http://<Public-ip-of-Firewall>:5000/products
+&
+http://<Public-ip-of-Firewall>:5000/users
+```
+
+and here is the final result
+
+![Result 1](docs/images/Result1.png)
+![Result 2](docs/images/Result2.png)
 
 ## Cleanup
 
