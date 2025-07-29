@@ -55,6 +55,8 @@ and here is the structure of those modules
 and here are the commands the has provisioned that Infra
 
 ```
+cd Terraform/
+
 #To download necessary providers and needed modules
 terraform init
 
@@ -128,7 +130,7 @@ az aks get-credentials --resource-group $RESOURCE_GROUP_NAME --name $AKS_NAME --
 3. Now to setup the VM to be a GitHub self-hosted runner
 
 ```
-# Create a folder (Note: if you will use the same VM for Multiple Pipelines change the folder name)
+# Create a folder (Note: if you will use the same VM for Multiple Pipelines change the folder name for each pipeline)
 $ mkdir actions-runner && cd actions-runner
 
 # Download the latest runner package
@@ -150,9 +152,35 @@ and this is how the setup was done
 
 ## CI/CD pipeline using GitHub actions
 
+Our project leverages robust Continuous Integration (CI) and Continuous Delivery (CD) pipelines, powered by GitHub Actions. This choice provides several key benefits, including tight integration with our GitHub repositories for seamless workflow automation, a flexible and extensible platform for custom build and deployment steps.
+
+We utilize a separate CI and CD pipeline strategy for this project. This separation further enhances security, clarifies responsibilities, offers greater flexibility, and improves overall scalability and maintainability by isolating build/test processes from deployment.
+
+#### Continuous Integration (CI) Pipeline
+
+Located in the [Microservices repository](https://www.linkedin.com/in/aly-ghazal/), our CI pipeline automatically builds, tests, and prepares the application for deployment upon code pushes or pull requests to main.
+
+Here's how it works:
+
+1. **Checkout Code & Set up Python**: The latest code is retrieved, and a Python 3.9 environment is established.
+2. **Run Static Code Analysis (Flake8)**: This critical step employs Flake8, a widely-used Python linter, to enforce code quality and style standards. It executes two distinct checks: a strict error analysis (--select=E9,F63,F7,F82) that reports fundamental issues like syntax errors, unused variables, or undefined names, and a comprehensive style and complexity check (--max-complexity=10 --max-line-length=120) that provides feedback on PEP 8 violations and code complexity. Both Flake8 commands are configured to provide detailed reports on code quality, aiding developers in maintaining a clean and robust codebase.
+3. **Build Docker Image**: The application is packaged into a Docker image (microservices-app:4.0) for our Azure Container Registry (akssecureacr.azurecr.io).
+4. **Scan Docker Image with Trivy**: The Docker image is scanned for HIGH and CRITICAL vulnerabilities. Any detected vulnerabilities will fail the pipeline.
+5. **Push Docker Image to Azure Container Registry (ACR)**: The validated Docker image is pushed to the registry, ready for deployment.
+
+#### Continuous Delivery (CD) Pipeline
+
+Our CD pipeline, in this repository that we are already in, automates deployment to the Kubernetes cluster. It triggers on main branch pushes or can be manually initiated.
+
+Here's its flow:
+
+1. **Checkout Repository**: The repository containing Kubernetes manifests is checked out.
+2. **Verify Kubectl Context**: Connectivity to the Kubernetes cluster is confirmed.
+3. **Apply Kubernetes Manifests in Order**: Kubernetes configuration files (Namespace, Deployment, Service) are applied sequentially from the Kubernetes/ directory to ensure proper resource creation and update.
+
 ## Results
 
-after provisioning our infra and deploy the application you can access it through the following URL
+after provisioning our infra and deploy the application you can access it through the following URLs
 
 ```
 http://<Public-ip-of-Firewall>:5000/products
@@ -170,6 +198,8 @@ and here is the final result
 One of the benefits of using terraform or IaC in general is the ability to provision and destroy the entire infra with a single command and in this case we can cleanup the following infra by using a single command as following
 
 ```
+cd Terraform/
+
 terraform destroy
 ```
 
